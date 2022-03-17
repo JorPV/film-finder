@@ -1,7 +1,7 @@
 function addMoviesToDom(movies) {
   const ulMovies = document.querySelector("#movies-list");
   // clear innerhtml
-  ulMovies.innerHTML = "";
+  ulMovies.innerHTML = " ";
   movies.map((m) => {
     const li = document.createElement("li");
     const a = document.createElement("a");
@@ -9,7 +9,7 @@ function addMoviesToDom(movies) {
     const img = document.createElement("img");
     // add attributes to img
     a.target = "_blank";
-    a.href = " ";
+    a.href = "https://www.imdb.com/title/" + m.imdbID;
     img.src = m.poster;
     a.appendChild(img);
     // append scr attribute to li tags
@@ -17,80 +17,53 @@ function addMoviesToDom(movies) {
     ulMovies.appendChild(li);
     return li;
   });
-  // console.log(ulMovies);
 }
 
 addMoviesToDom(movies);
 
 function filterMovies(selectFilms) {
-  // FILTER Movies 2014 or newer
+  console.log("Selected filter: ", selectFilms);
+  const filterMovies = movies.filter((movie) =>
+    movie.title.toLowerCase().includes(`${selectFilms}`)
+  );
+  console.log(filterMovies);
+  return filterMovies;
+}
+
+function filterLatestMovies() {
   const newMovies = movies.filter(function (obj) {
     return obj.year >= "2014";
   });
   console.log(newMovies);
-  // FILTER Movies X-Men
-  const arrayXMen = movies.filter(function (obj) {
-    for (filter in obj) {
-      if (obj[filter].includes("X-Men")) {
-        return obj;
-      }
-    }
-  });
-  console.log(arrayXMen);
-  // FILTER movies Avengers
-  const arrayAvengers = movies.filter(function (obj) {
-    for (key in obj) {
-      if (obj[key].includes("Avengers")) {
-        return obj;
-      }
-    }
-  });
-  console.log(arrayAvengers);
-  // FILTER movies Princess
-  const arrayPrincess = movies.filter(function (obj) {
-    for (key in obj) {
-      if (obj[key].includes("Princess")) {
-        return obj;
-      }
-    }
-  });
-  console.log(arrayPrincess);
-  // FILTER movies Batman
-  const arrayBatman = movies.filter(function (obj) {
-    for (key in obj) {
-      if (obj[key].includes("Batman")) {
-        return obj;
-      }
-    }
-  });
-  console.log(arrayBatman);
-};
-
+  return newMovies;
+}
 
 // Create a function handleOnChangeEvent() with as argument the word "event" that fires when a change has been made by one of the radio buttons.
 function handleOnChangeEvent(event) {
   const valueBtn = event.target.value;
-  // // step 1 : give event to filterMovies(wordInMovie)
-  filterMovies();
-  handleOnChangeEvent("event");
 
   switch (valueBtn) {
-    case "Latest-movies":
-      filterMovies(wordInMovie);
-      console.log("Hey I am a new film");
-    case "X-Men-films":
-      addMoviesToDom(wordInMovie);
-      console.log("Hey I am a X-Men film");
-    case "Avenger-films":
-      addMoviesToDom(wordInMovie);
-      console.log("Hey I am a Avengers film");
-    case "Princess-films":
-      addMoviesToDom(wordInMovie);
-      console.log("Hey I am a Princess film");
-    case "Batman-films":
-      addMoviesToDom(wordInMovie);
-      console.log("Hey i am a Batman film");
-  };
+    case "latest-movies":
+      console.log("These are all films from 2014 or newer");
+      addMoviesToDom(filterLatestMovies());
+      break;
+    case "avenger":
+      console.log("These are all Avenger films");
+      addMoviesToDom(filterMovies(valueBtn));
+      break;
+    case "x-men":
+      console.log("These are all X-Men films");
+      addMoviesToDom(filterMovies(valueBtn));
+      break;
+    case "princess":
+      console.log("These are all Princess films");
+      addMoviesToDom(filterMovies(valueBtn));
+      break;
+    case "batman":
+      console.log("These are all Batman films");
+      addMoviesToDom(filterMovies(valueBtn));
+      break;
+  }
 }
 
 // Select all radio buttons & attach an event listener.
@@ -99,13 +72,32 @@ radioBtns.forEach((btn) =>
   btn.addEventListener("change", (event) => handleOnChangeEvent(event))
 );
 
-function movieInImdb() {
-  const imdbData = [...new Set(movies.map((film) => film.imdbID))];
-  const urlImdb = "https://www.imdb.com/title/";
-  imdbData.forEach(function (item) {
-    const filmUrl = urlImdb + item;
-    console.log(filmUrl);
+// Click on h1 for all movie
+const superheroesMovies = document
+  .querySelector("h1")
+  .addEventListener("click", function (event) {
+    console.log(movies);
+    return addMoviesToDom(movies);
   });
-}
-movieInImdb();
 
+// Search bar event
+const searchBar = document.querySelector("#search");
+
+searchBar.addEventListener("keypress", function (event) {
+  if (event.keyCode === 13) {
+    const searchValue = searchBar.value;
+    console.log("Your search: " + searchValue);
+    const newVar = searchByWord(searchValue);
+    addMoviesToDom(newVar);
+  } else {
+    return false;
+  }
+});
+
+function searchByWord(wordInMovie) {
+  return movies.filter((film) =>
+    film.title
+      .toLocaleLowerCase()
+      .includes(wordInMovie.toString().toLocaleLowerCase())
+  );
+}
